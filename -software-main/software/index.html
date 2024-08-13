@@ -1,0 +1,1008 @@
+
+<html><head><base href="https://ai-showcase.com/" />
+  <title>AI Showcase - Dynamic Color Transitions</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+  
+    :root {
+      --mint-green: #98ff98;
+      --black: #000000;
+    }
+  
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--black);
+      color: var(--mint-green);
+      overflow-x: hidden;
+      cursor: none;
+    }
+  
+    body::-webkit-scrollbar {
+      display: none;
+    }
+  
+    body {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  
+    .content {
+      position: relative;
+      z-index: 1;
+    }
+  
+    nav {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+  
+    .menu-toggle {
+      font-size: 2rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      z-index: 1001;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      padding: 5px;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+  
+    .menu-toggle span {
+      display: block;
+      width: 100%;
+      height: 3px;
+      transition: background-color 0.3s ease;
+    }
+  
+    .menu {
+      position: fixed;
+      top: 0;
+      right: -300px;
+      width: 300px;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(10px);
+      transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+      overflow: hidden;
+    }
+  
+    .menu.active {
+      transform: translateX(-300px);
+    }
+  
+    .menu ul {
+      list-style: none;
+      padding: 0;
+      margin: 60px 0 0 0;
+      height: calc(100% - 60px);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+  
+    .menu li {
+      opacity: 0;
+      transform: translateX(50px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+  
+    .menu.active li {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  
+    .menu a {
+      color: var(--mint-green);
+      text-decoration: none;
+      font-size: 1.2rem;
+      font-weight: 600;
+      display: block;
+      padding: 15px 30px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+  
+    .menu a::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(152, 255, 152, 0.2), transparent);
+      transition: 0.5s;
+    }
+  
+    .menu a:hover::before {
+      left: 100%;
+    }
+  
+    .menu a:hover {
+      color: var(--black);
+      background-color: var(--mint-green);
+    }
+  
+    .section {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      box-sizing: border-box;
+      position: relative;
+      overflow: hidden;
+      transition: background-color 0.5s ease, color 0.5s ease;
+    }
+  
+    .section:nth-child(odd) {
+      background-color: var(--black);
+      color: var(--mint-green);
+    }
+  
+    .section:nth-child(even) {
+      background-color: var(--mint-green);
+      color: var(--black);
+    }
+  
+    h1, h2 {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+      text-align: center;
+      position: relative;
+    }
+  
+    .button {
+      display: inline-block;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 30px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: none;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+  
+    .section:nth-child(odd) .button {
+      background: var(--mint-green);
+      color: var(--black);
+    }
+  
+    .section:nth-child(even) .button {
+      background: var(--black);
+      color: var(--mint-green);
+    }
+  
+    .button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: 0.5s;
+    }
+  
+    .button:hover::before {
+      left: 100%;
+    }
+  
+    #custom-cursor {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transition: background-color 0.3s ease;
+      transform: translate(-50%, -50%);
+    }
+  
+    #cursor-follower {
+      width: 40px;
+      height: 40px;
+      border: 2px solid;
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9998;
+      transition: border-color 0.3s ease;
+      transform: translate(-50%, -50%);
+    }
+  
+    .section:nth-child(odd) ::selection {
+      background-color: var(--mint-green);
+      color: var(--black);
+    }
+  
+    .section:nth-child(even) ::selection {
+      background-color: var(--black);
+      color: var(--mint-green);
+    }
+  
+    .text-content {
+      max-width: 800px;
+      text-align: center;
+      margin-bottom: 2rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+  
+    .text-content.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  
+    .floating-shapes {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+    }
+  
+    .shape {
+      position: absolute;
+      opacity: 0.2;
+      animation: float 15s infinite;
+    }
+  
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
+    }
+  
+    .glow {
+      text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+  
+    @keyframes glow {
+      from { text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor; }
+      to { text-shadow: 0 0 20px currentColor, 0 0 30px currentColor, 0 0 40px currentColor; }
+    }
+  
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      animation: ripple 1s linear;
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+  
+    @keyframes ripple {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+  
+    .section h2 {
+      position: relative;
+      display: inline-block;
+    }
+  
+    .section h2::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -5px;
+      width: 0;
+      height: 3px;
+      background-color: currentColor;
+      transition: width 0.5s ease;
+    }
+  
+    .section h2:hover::after {
+      width: 100%;
+    }
+  
+    .button {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+  
+    .button:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+  
+    .glitch {
+      position: relative;
+    }
+  
+    .glitch::before,
+    .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+  
+    .glitch::before {
+      left: 2px;
+      text-shadow: -2px 0 #ff00c1;
+      clip: rect(44px, 450px, 56px, 0);
+      animation: glitch-anim 5s infinite linear alternate-reverse;
+    }
+  
+    .glitch::after {
+      left: -2px;
+      text-shadow: -2px 0 #00fff9, 2px 2px #ff00c1;
+      animation: glitch-anim2 1s infinite linear alternate-reverse;
+    }
+  
+    @keyframes glitch-anim {
+      0% {
+        clip: rect(10px, 9999px, 62px, 0);
+        transform: skew(0.6deg);
+      }
+      5% {
+        clip: rect(70px, 9999px, 5px, 0);
+        transform: skew(0.2deg);
+      }
+      10% {
+        clip: rect(30px, 9999px, 26px, 0);
+        transform: skew(0.8deg);
+      }
+      15% {
+        clip: rect(14px, 9999px, 92px, 0);
+        transform: skew(0.1deg);
+      }
+      20% {
+        clip: rect(53px, 9999px, 7px, 0);
+        transform: skew(0.7deg);
+      }
+      25% {
+        clip: rect(89px, 9999px, 34px, 0);
+        transform: skew(0.9deg);
+      }
+      30% {
+        clip: rect(75px, 9999px, 61px, 0);
+        transform: skew(0.3deg);
+      }
+      35% {
+        clip: rect(23px, 9999px, 44px, 0);
+        transform: skew(0.5deg);
+      }
+      40% {
+        clip: rect(66px, 9999px, 93px, 0);
+        transform: skew(0.4deg);
+      }
+      45% {
+        clip: rect(3px, 9999px, 6px, 0);
+        transform: skew(0.2deg);
+      }
+      50% {
+        clip: rect(42px, 9999px, 21px, 0);
+        transform: skew(0.6deg);
+      }
+      55% {
+        clip: rect(56px, 9999px, 88px, 0);
+        transform: skew(0.8deg);
+      }
+      60% {
+        clip: rect(81px, 9999px, 15px, 0);
+        transform: skew(0.1deg);
+      }
+      65% {
+        clip: rect(9px, 9999px, 70px, 0);
+        transform: skew(0.7deg);
+      }
+      70% {
+        clip: rect(37px, 9999px, 54px, 0);
+        transform: skew(0.9deg);
+      }
+      75% {
+        clip: rect(94px, 9999px, 32px, 0);
+        transform: skew(0.3deg);
+      }
+      80% {
+        clip: rect(18px, 9999px, 77px, 0);
+        transform: skew(0.5deg);
+      }
+      85% {
+        clip: rect(61px, 9999px, 49px, 0);
+        transform: skew(0.4deg);
+      }
+      90% {
+        clip: rect(83px, 9999px, 11px, 0);
+        transform: skew(0.2deg);
+      }
+      95% {
+        clip: rect(25px, 9999px, 98px, 0);
+        transform: skew(0.6deg);
+      }
+      100% {
+        clip: rect(47px, 9999px, 39px, 0);
+        transform: skew(0.8deg);
+      }
+    }
+  
+    @keyframes glitch-anim2 {
+      0% {
+        clip: rect(65px, 9999px, 99px, 0);
+        transform: skew(0.4deg);
+      }
+      5% {
+        clip: rect(32px, 9999px, 18px, 0);
+        transform: skew(0.8deg);
+      }
+      10% {
+        clip: rect(84px, 9999px, 51px, 0);
+        transform: skew(0.3deg);
+      }
+      15% {
+        clip: rect(7px, 9999px, 77px, 0);
+        transform: skew(0.1deg);
+      }
+      20% {
+        clip: rect(92px, 9999px, 23px, 0);
+        transform: skew(0.7deg);
+      }
+      25% {
+        clip: rect(16px, 9999px, 68px, 0);
+        transform: skew(0.5deg);
+      }
+      30% {
+        clip: rect(39px, 9999px, 11px, 0);
+        transform: skew(0.2deg);
+      }
+      35% {
+        clip: rect(72px, 9999px, 46px, 0);
+        transform: skew(0.6deg);
+      }
+      40% {
+        clip: rect(55px, 9999px, 95px, 0);
+        transform: skew(0.9deg);
+      }
+      45% {
+        clip: rect(28px, 9999px, 3px, 0);
+        transform: skew(0.4deg);
+      }
+      50% {
+        clip: rect(81px, 9999px, 63px, 0);
+        transform: skew(0.8deg);
+      }
+      55% {
+        clip: rect(9px, 9999px, 37px, 0);
+        transform: skew(0.3deg);
+      }
+      60% {
+        clip: rect(94px, 9999px, 75px, 0);
+        transform: skew(0.1deg);
+      }
+      65% {
+        clip: rect(46px, 9999px, 20px, 0);
+        transform: skew(0.7deg);
+      }
+      70% {
+        clip: rect(67px, 9999px, 86px, 0);
+        transform: skew(0.5deg);
+      }
+      75% {
+        clip: rect(13px, 9999px, 59px, 0);
+        transform: skew(0.2deg);
+      }
+      80% {
+        clip: rect(90px, 9999px, 42px, 0);
+        transform: skew(0.6deg);
+      }
+      85% {
+        clip: rect(24px, 9999px, 78px, 0);
+        transform: skew(0.9deg);
+      }
+      90% {
+        clip: rect(50px, 9999px, 5px, 0);
+        transform: skew(0.4deg);
+      }
+      95% {
+        clip: rect(71px, 9999px, 97px, 0);
+        transform: skew(0.8deg);
+      }
+      100% {
+        clip: rect(35px, 9999px, 31px, 0);
+        transform: skew(0.3deg);
+      }
+    }
+  
+    .reveal-text {
+      position: relative;
+      overflow: hidden;
+    }
+  
+    .reveal-text::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--mint-green);
+      transform: translateX(-100%);
+      animation: revealText 1s ease forwards;
+    }
+  
+    @keyframes revealText {
+      to {
+        transform: translateX(100%);
+      }
+    }
+  
+    .magnetic-button {
+      display: inline-block;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 30px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: none;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+  
+    .magnetic-button:hover {
+      transform: scale(1.1);
+    }
+  
+    #section1 .button {
+      background-color: var(--mint-green);
+      color: var(--black);
+    }
+  
+    #section10 .button {
+      background-color: var(--black);
+      color: var(--mint-green);
+    }
+  </style>
+  </head>
+  <body>
+    <div id="custom-cursor"></div>
+    <div id="cursor-follower"></div>
+  
+    <nav>
+      <button class="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="menu">
+        <ul>
+          <li><a href="#section1">#⨜.৻.Ι.Ξ.Π.৻.Ξ.⨜</a></li>
+          <li><a href="#section2">#⨜.৻.Ι.Ξ.Π.৻.Ξ.⨜ (software)</a></li>
+          <li><a href="#section3">SOON</a></li>
+          <li><a href="#section4">BioMinds.ai</a></li>
+          <li><a href="#section5">DNA storage</a></li>
+          <li><a href="#section6">SOON</a></li>
+          <li><a href="#section7">SOON</a></li>
+          <li><a href="#section8">SOON</a></li>
+          <li><a href="#section9">SOON</a></li>
+          <li><a href="#section10">SOON</a></li>
+        </ul>
+      </div>
+    </nav>
+  
+    <div class="content">
+      <div class="section" id="section1">
+        <h1>#⨜.৻.Ι.Ξ.Π.৻.Ξ.⨜</h1>
+        <div class="text-content">
+          <p></p>
+        </div>
+      </div>
+  
+      <div class="section" id="section2">
+        <div class="floating-shapes"></div>
+        <h2 class="reveal-text">#⨜.৻.Ι.Ξ.Π.৻.Ξ.⨜ (software)</h2>
+        <div class="text-content">
+          <p>The # SCIENCES Project revolutionizes scientific exploration with a powerful AI, ultra-realistic simulation maps, and advanced features for data visualization and real-time collaboration. It enables in-depth study of various scientific fields like quantum physics, astronomy, molecular biology, geology, and advanced engineering. This platform offers an immersive experience, driving innovation and expanding scientific knowledge boundaries.</p>
+        </div>
+        <a href="" class="button">Discover</a>
+      </div>
+  
+      <div class="section" id="section3">
+        <div class="floating-shapes"></div>
+        <h2>SOON</h2>
+        <div class="text-content">
+          <p></p>
+        </div>
+        <a href="" class="button">Discover</a>
+      </div>
+  
+      <div class="section" id="section4">
+        <div class="floating-shapes"></div>
+        <h2 class="glow">BioMinds.ai</h2>
+        <div class="text-content">
+          <p>This project aims to create AI-generated virtual worlds with Unreal Engine 5 and Python, simulate brain environments, integrate advanced AI models like LLaMa 3.1, use DNA storage for large data, and democratize access to technology in AI, science, and computing. Future goals include advancing AI capabilities and DNA storage, while addressing challenges in ethics, impact, and accessibility.</p>
+        </div>
+        <a href="" class="button">Discover</a>
+      </div>
+  
+      <div class="section" id="section5">
+        <div class="floating-shapes"></div>
+        <h2>DNA storage</h2>
+        <div class="text-content">
+          <p>DNA storage encodes digital data into the sequences of DNA's nucleotides (A, T, C, G). For instance, an entire library's worth of data can be converted into DNA, which is then synthesized and stored. This method offers extremely dense and durable data storage, lasting thousands of years.</p>
+        </div>
+        <a href="" class="button">Discover</a>
+      </div>
+  
+      <div class="section" id="section6">
+        <div class="floating-shapes"></div>
+        <h2 class="reveal-text">SOON</h2>
+        <div class="text-content">
+          <p></p>
+        </div>
+        <a href="" class="button">Next Section</a>
+      </div>
+  
+      <div class="section" id="section7">
+        <div class="floating-shapes"></div>
+        <h2>SOON</h2>
+        <div class="text-content">
+          <p></p>
+        </div>
+        <a href="" class="button">Continue</a>
+      </div>
+  
+      <div class="section" id="section8">
+        <div class="floating-shapes"></div>
+        <h2 class="glow">SOON</h2>
+        <div class="text-content">
+          <p></p>
+        </div>
+        <a href="" class="button">Next Topic</a>
+      </div>
+  
+      <div class="section" id="section9">
+        <div class="floating-shapes"></div>
+        <h2>SOON</h2>
+        <div class="text-content">
+          <p></p>
+        </div>
+        <a href="" class="button">Final Section</a>
+      </div>
+  
+      <div class="section" id="section10">
+        <div class="floating-shapes"></div>
+        <h2>SOON</h2>
+        <div class="text-content">
+          <p></p>
+        </div>
+        <a href="" class="button">Back to Top</a>
+      </div>
+    </div>
+  
+    <script>
+      gsap.registerPlugin(ScrollTrigger);
+  
+      // Custom cursor
+      const cursor = document.getElementById('custom-cursor');
+      const cursorFollower = document.getElementById('cursor-follower');
+      const menuToggle = document.querySelector('.menu-toggle');
+      const menuToggleSpans = menuToggle.querySelectorAll('span');
+  
+      function updateColors() {
+        const sections = document.querySelectorAll('.section');
+        let isEvenSection = false;
+  
+        for (const section of sections) {
+          const rect = section.getBoundingClientRect();
+          if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
+            isEvenSection = Array.from(sections).indexOf(section) % 2 !== 0;
+            break;
+          }
+        }
+  
+        cursor.style.backgroundColor = isEvenSection ? 'var(--black)' : 'var(--mint-green)';
+        cursorFollower.style.borderColor = isEvenSection ? 'var(--black)' : 'var(--mint-green)';
+        
+        menuToggle.style.backgroundColor = isEvenSection ? 'var(--mint-green)' : 'var(--black)';
+        menuToggleSpans.forEach(span => {
+          span.style.backgroundColor = isEvenSection ? 'var(--black)' : 'var(--mint-green)';
+        });
+      }
+  
+      let mouseX = 0, mouseY = 0;
+      let cursorX = 0, cursorY = 0;
+  
+      document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      });
+  
+      function animateCursor() {
+        let dx = mouseX - cursorX;
+        let dy = mouseY - cursorY;
+  
+        cursorX += dx * 0.2;
+        cursorY += dy * 0.2;
+  
+        cursor.style.left = cursorX + 'px';
+        cursor.style.top = cursorY + 'px';
+  
+        cursorFollower.style.left = mouseX + 'px';
+        cursorFollower.style.top = mouseY + 'px';
+  
+        requestAnimationFrame(animateCursor);
+      }
+  
+      animateCursor();
+  
+      // Menu toggle
+      const menu = document.querySelector('.menu');
+      const menuItems = document.querySelectorAll('.menu li');
+  
+      menuToggle.addEventListener('click', () => {
+        menu.classList.toggle('active');
+        if (menu.classList.contains('active')) {
+          menuItems.forEach((item, index) => {
+            gsap.to(item, {
+              opacity: 1,
+              x: 0,
+              duration: 0.5,
+              delay: index * 0.1,
+              ease: "power2.out"
+            });
+          });
+        } else {
+          menuItems.forEach((item) => {
+            gsap.to(item, {
+              opacity: 0,
+              x: 50,
+              duration: 0.3,
+              ease: "power2.in"
+            });
+          });
+        }
+      });
+  
+      // Smooth scrolling for menu items
+      document.querySelectorAll('.menu a, .button').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          const targetId = this.getAttribute('href');
+          const targetSection = document.querySelector(targetId);
+          
+          if (targetSection) {
+            gsap.to(window, {
+              duration: 1,
+              scrollTo: targetSection,
+              ease: "power2.inOut"
+            });
+  
+            // Close menu
+            menu.classList.remove('active');
+            menuItems.forEach((item) => {
+              gsap.to(item, {
+                opacity: 0,
+                x: 50,
+                duration: 0.3,
+                ease: "power2.in"
+              });
+            });
+          }
+        });
+      });
+  
+      // Floating animation for buttons
+      gsap.to('.button', {
+        y: -10,
+        duration: 1.5,
+        repeat: -1,
+        yoyo: true,
+        ease: "power1.inOut"
+      });
+  
+      // Text content animation
+      const textContents = document.querySelectorAll('.text-content');
+      textContents.forEach((content) => {
+        gsap.to(content, {
+          scrollTrigger: {
+            trigger: content,
+            start: "top 80%",
+            end: "bottom 20%",
+            toggleClass: "visible",
+            once: true
+          }
+        });
+      });
+  
+      // Floating shapes animation
+      const colors = ['var(--mint-green)', 'var(--black)'];
+      const shapes = ['circle', 'square'];
+  
+      function createShape() {
+        const shape = document.createElement('div');
+        shape.classList.add('shape');
+        const size = Math.random() * 50 + 10;
+        shape.style.width = `${size}px`;
+        shape.style.height = `${size}px`;
+        shape.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        shape.style.left = `${Math.random() * 100}%`;
+        shape.style.top = `${Math.random() * 100}%`;
+        
+        const shapeType = shapes[Math.floor(Math.random() * shapes.length)];
+        if (shapeType === 'circle') {
+          shape.style.borderRadius = '50%';
+        }
+  
+        shape.style.animationDuration = `${Math.random() * 10 + 5}s`;
+        shape.style.animationDelay = `${Math.random() * 5}s`;
+  
+        return shape;
+      }
+  
+      const floatingShapesContainers = document.querySelectorAll('.floating-shapes');
+      floatingShapesContainers.forEach((container) => {
+        for (let i = 0; i < 10; i++) {
+          container.appendChild(createShape());
+        }
+      });
+  
+      // Update colors on scroll
+      window.addEventListener('scroll', updateColors);
+      updateColors(); // Initial call to set colors
+  
+      // Ripple effect
+      document.addEventListener('click', function(e) {
+        const ripple = document.createElement('div');
+        ripple.classList.add('ripple');
+        ripple.style.left = e.clientX + 'px';
+        ripple.style.top = e.clientY + 'px';
+        document.body.appendChild(ripple);
+        setTimeout(() => {
+          ripple.remove();
+        }, 1000);
+      });
+  
+      // Text scramble effect
+      class TextScramble {
+        constructor(el) {
+          this.el = el;
+          this.chars = '!<>-_\\/[]{}—=+*^?#________';
+          this.update = this.update.bind(this);
+        }
+        setText(newText) {
+          const oldText = this.el.innerText;
+          const length = Math.max(oldText.length, newText.length);
+          const promise = new Promise((resolve) => this.resolve = resolve);
+          this.queue = [];
+          for (let i = 0; i < length; i++) {
+            const from = oldText[i] || '';
+            const to = newText[i] || '';
+            const start = Math.floor(Math.random() * 40);
+            const end = start + Math.floor(Math.random() * 40);
+            this.queue.push({ from, to, start, end });
+          }
+          cancelAnimationFrame(this.frameRequest);
+          this.frame = 0;
+          this.update();
+          return promise;
+        }
+        update() {
+          let output = '';
+          let complete = 0;
+          for (let i = 0, n = this.queue.length; i < n; i++) {
+            let { from, to,
+   start, end } = this.queue[i];
+            if (this.frame >= end) {
+              complete++;
+              output += to;
+            } else if (this.frame >= start) {
+              if (!to || Math.random() < 0.28) {
+                output += this.chars[Math.floor(Math.random() * this.chars.length)];
+              } else {
+                output += to;
+              }
+            } else {
+              output += from;
+            }
+          }
+          this.el.innerHTML = output;
+          if (complete === this.queue.length) {
+            this.resolve();
+          } else {
+            this.frameRequest = requestAnimationFrame(this.update);
+            this.frame++;
+          }
+        }
+      }
+  
+      // Apply text scramble effect to h2 elements
+      const h2Elements = document.querySelectorAll('h2');
+      h2Elements.forEach((el) => {
+        const fx = new TextScramble(el);
+        el.addEventListener('mouseenter', () => {
+          fx.setText(el.textContent);
+        });
+        el.addEventListener('mouseleave', () => {
+          fx.setText(el.getAttribute('data-text') || el.textContent);
+        });
+        el.setAttribute('data-text', el.textContent);
+      });
+  
+      // Magnetic effect for buttons
+      const buttons = document.querySelectorAll('.button');
+      buttons.forEach((button) => {
+        button.addEventListener('mousemove', (e) => {
+          const position = button.getBoundingClientRect();
+          const x = e.clientX - position.left - position.width / 2;
+          const y = e.clientY - position.top - position.height / 2;
+          
+          button.style.transform = `translate(${x * 0.3}px, ${y * 0.5}px)`;
+        });
+        
+        button.addEventListener('mouseout', () => {
+          button.style.transform = 'translate(0px, 0px)';
+        });
+      });
+  
+      // 3D parallax effect
+      const parallaxContainers = document.querySelectorAll('.section');
+      parallaxContainers.forEach((container) => {
+        container.addEventListener('mousemove', (e) => {
+          const { left, top, width, height } = container.getBoundingClientRect();
+          const x = (e.clientX - left) / width - 0.5;
+          const y = (e.clientY - top) / height - 0.5;
+  
+          gsap.to(container, {
+            rotationY: x * 10,
+            rotationX: -y * 10,
+            translateZ: 50,
+            duration: 0.5,
+            ease: 'power2.out'
+          });
+        });
+  
+        container.addEventListener('mouseleave', () => {
+          gsap.to(container, {
+            rotationY: 0,
+            rotationX: 0,
+            translateZ: 0,
+            duration: 0.5,
+            ease: 'power2.out'
+          });
+        });
+      });
+  
+      // Initialize ScrollTrigger for each section
+      gsap.utils.toArray('.section').forEach((section, i) => {
+        ScrollTrigger.create({
+          trigger: section,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true,
+          onEnter: () => {
+            section.classList.add('active');
+          },
+          onLeaveBack: () => {
+            section.classList.remove('active');
+          }
+        });
+      });
+    </script>
+  </body>
+  </html>

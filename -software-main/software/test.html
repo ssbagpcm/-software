@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>#⨜.৻.Ι.Ξ.Π.৻.Ξ.⨜</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #ffffff;
+            cursor: url('cursor.png'), auto;
+        }
+
+        #container {
+            display: flex;
+            width: 300vw;
+            height: 100vh;
+            transition: transform 1s ease, opacity 1s ease;
+            transform: translateX(0);
+            perspective: 1000px;
+        }
+
+        .section {
+            width: 100vw;
+            height: 100vh;
+            flex-shrink: 0;
+            box-sizing: border-box;
+            padding: 20px;
+            transition: background-color 1s ease, opacity 1s ease, transform 1s ease, filter 1s ease;
+            opacity: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: scale(0.8) rotateY(10deg);
+            filter: brightness(70%) blur(10px);
+            overflow: hidden;
+        }
+
+        #left-section, #right-section, #middle-section {
+            background-color: #000;
+        }
+
+        .expand {
+            width: 60px;
+            height: 60px;
+            border-width: 3px;
+            mix-blend-mode: normal;
+        }
+
+        .magnetic-item {
+            display: inline-block;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .grid-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: -1;
+            animation: gridPulse 10s infinite alternate;
+        }
+
+        @keyframes gridPulse {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <!-- Section gauche -->
+        <div id="left-section" class="section" style="background-color: #000000;">
+            <div class="content">
+                <!-- Intégration de Solar System 3D -->
+                <h1>Solar System 3D</h1>
+                <style>
+                    body {
+                        overflow: hidden;
+                        margin: 0;
+                        cursor: url('cursor.png'), auto;
+                    }
+                </style>
+                <link rel="icon" type="image/png" href="./image/solar-system.png" />
+                <script>
+                    setTimeout(() => {
+                        const script = document.createElement('script');
+                        src="./js/solarSystem.js"
+                        script.type = 'module';
+                        document.querySelector('#left-section .content').appendChild(script);
+                    }, 1000);
+                </script>
+            </div>
+        </div>
+
+        <!-- Section centrale -->
+        <div id="middle-section" class="section">
+            <div class="content">
+                <h1>Présentation</h1>
+                <p>Bienvenue à notre présentation interactive.</p>
+                <style>
+                    .content {
+                        color: #00ccff;
+                    }
+                </style>
+                <script>
+                    console.log("Présentation chargée.");
+                </script>
+            </div>
+        </div>
+
+        <!-- Section droite -->
+        <div id="right-section" class="section">
+            <div class="content">
+                <h1>ChatGPT</h1>
+                <p>Découvrez la puissance de l'IA avec ChatGPT.</p>
+                <style>
+                    .content {
+                        color: #ff00cc;
+                    }
+                </style>
+                <script>
+                    console.log("ChatGPT est chargé.");
+                </script>
+            </div>
+        </div>
+    </div>
+
+    <audio id="background-music" src="chemin/vers/votre_fichier.mp3" autoplay loop>
+        Votre navigateur ne supporte pas l'élément audio.
+    </audio>
+    <div class="grid-background"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('container');
+            const sections = document.querySelectorAll('.section');
+            let currentSectionIndex = 1;
+
+            function updateSection() {
+                sections.forEach((section, index) => {
+                    if (index === currentSectionIndex) {
+                        section.style.opacity = 1;
+                        section.style.transform = 'scale(1) rotateY(0deg)';
+                        section.style.filter = 'brightness(100%) blur(0)';
+                    } else {
+                        section.style.opacity = 0;
+                        section.style.transform = 'scale(0.8) rotateY(10deg)';
+                        section.style.filter = 'brightness(70%) blur(10px)';
+                    }
+                });
+                container.style.transform = `translateX(-${currentSectionIndex * 100}vw)`;
+            }
+
+            updateSection();
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'ArrowLeft') {
+                    if (currentSectionIndex > 0) {
+                        currentSectionIndex--;
+                        updateSection();
+                    }
+                } else if (event.key === 'ArrowRight') {
+                    if (currentSectionIndex < 2) {
+                        currentSectionIndex++;
+                        updateSection();
+                    }
+                }
+            });
+
+            const interactiveElements = document.querySelectorAll('button, .magnetic-item, a, input, textarea');
+
+            interactiveElements.forEach((el) => {
+                el.addEventListener('mouseenter', () => {
+                    cursor.classList.add('expand');
+                    cursorDot.style.width = '0px';
+                    cursorDot.style.height = '0px';
+                });
+
+                el.addEventListener('mouseleave', () => {
+                    cursor.classList.remove('expand');
+                    cursorDot.style.width = '6px';
+                    cursorDot.style.height = '6px';
+                });
+            });
+
+            function applyMagneticEffect(elements) {
+                elements.forEach(element => {
+                    element.addEventListener('mousemove', (event) => {
+                        const rect = element.getBoundingClientRect();
+                        const elementCenterX = rect.left + rect.width / 2;
+                        const elementCenterY = rect.top + rect.height / 2;
+                        const distanceX = (event.clientX - elementCenterX) * 0.1;
+                        const distanceY = (event.clientY - elementCenterY) * 0.1;
+
+                        element.style.transform = `translate(${distanceX}px, ${distanceY}px)`;
+                    });
+
+                    element.addEventListener('mouseleave', () => {
+                        element.style.transform = 'translate(0, 0)';
+                    });
+                });
+            }
+
+            applyMagneticEffect(document.querySelectorAll('.magnetic-item'));
+
+        });
+    </script>
+</body>
+</html>
